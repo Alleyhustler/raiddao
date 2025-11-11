@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  <title>Raid DAO</title>
+  <style type="text/css">
+    * { 
+      -moz-box-sizing: border-box; 
+      -webkit-box-sizing: border-box; 
+      box-sizing: border-box; 
+      margin:0;
+      padding:0;
+    }
+
+    body, html {
+      background-color:#000;
+      -webkit-transition:background 0.33s;
+      -moz-transition:background 0.33s;
+      transition:background 0.33s;
+      width:100%;
+      height:100%;
+      overflow:hidden; /* Keep overflow hidden for background scrolling effect */
+      font-family:monospace;
+      font-size:20px; /* Adjusted font size for better readability */
+      font-weight:bold;
+      color:#fff; /* Default text color */
+    }
+    
+    body.bg {
+      /* Background image is set dynamically by JavaScript, so no direct url() here */
+      background-repeat:repeat; /* Allow the map to repeat for scrolling effect */
+    }
+
+    .main {
+      width:1200px; /* Increased width to accommodate more content */
+      height:800px; /* Increased height */
+      margin:0 auto;
+      color:#fff;
+      position:relative;
+      display: flex;
+      flex-wrap: wrap; /* Allow containers to wrap */
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 20px;
+      z-index: 10; /* Ensure content is above the scrolling background */
+    }
+
+    .window {
+      border:3px #fff solid;
+      border-radius:3px;
+      background:#000;
+      padding:15px 20px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .window .title {
+      display:block;
+      position:absolute;
+      width:100%;
+      top:-16px;
+      left: 0;
+      text-align:center;
+    }
+
+    .title h3 {
+      display:inline-block;
+      background:#000;
+      padding:0 10px;
+      overflow:hidden;
+      font-size: 24px;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      width: 100%; /* Take full width */
+
+    }
+    .header-logo img {
+      height: 60px; /* Adjust logo size */
+      margin-right: 15px;
+            border-radius: 50%;
+    }
+    .header-logo h1 {
+      font-size: 48px;
+      margin: 0;
+    }
+
+    /* Specific window styles */
+    .info-panel {
+      width: 30%; /* Adjust width for left column */
+      min-height: 200px;
+    }
+
+    .raid-panel {
+      width: 65%; /* Adjust width for right column */
+      min-height: 200px;
+    }
+
+    .lore-panel, .features-panel, .how-it-works-panel {
+      width: 48%; /* Adjust width for two-column layout */
+      margin-right: 2%; /* Gap between columns */
+    }
+    .how-it-works-panel:last-of-type {
+      margin-right: 0;
+    }
+    .lore-panel {
+      width: 100%; /* Lore takes full width below the interactive part */
+      min-height: 250px;
+    }
+    .features-panel {
+      width: 48%;
+    }
+    .how-it-works-panel {
+      width: 48%;
+    }
+
+
+    /* Text and link styling */
+    a {
+      color: #fff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    ul {
+      list-style-type: decimal;
+      margin-left: 20px;
+      padding-top: 10px;
+    }
+    li {
+      margin-bottom: 5px;
+    }
+
+    .kol-raid-section {
+      display: flex;
+      align-items: center;
+      margin-top: 15px;
+      margin-bottom: 15px;
+    }
+    .kol-raid-section img {
+      width: 100px;
+      height: 100px;
+      border: 2px solid #fff;
+      border-radius: 3px;
+      margin-right: 15px;
+    }
+    .kol-details strong {
+      display: block;
+      font-size: 22px;
+      margin-bottom: 5px;
+    }
+    .kol-details p {
+      margin-top: 5px;
+      font-size: 18px;
+    }
+
+    .next-raid-timer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 36px;
+      background: #333;
+      padding: 10px;
+      border-radius: 3px;
+    }
+    .next-raid-timer span {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .raid-phrase-section {
+      margin-top: 20px;
+      border-top: 2px dashed #fff;
+      padding-top: 15px;
+    }
+    .raid-phrase-section strong {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+    .raid-phrase-section p {
+      background: #1a1a1a;
+      padding: 10px;
+      border-radius: 3px;
+    }
+
+    .credit {
+      position:absolute;
+      bottom:20px;
+      left:20px; /* Adjusted position */
+      color:#fff;
+      font-size: 16px;
+    }
+
+    .join-button {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background-color: #000;
+      border: 3px solid #fff;
+      border-radius: 3px;
+      color: #fff;
+      font-weight: bold;
+      font-size: 24px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .join-button:hover {
+      background-color: #fff;
+      color: #000;
+    }
+
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    // Original chooseBg function from the template
+    function chooseBg() {
+      const bgs = ['map.png']; // Ensure these files exist or update paths
+      const rollBg = Math.floor((Math.random() * bgs.length));
+      $('body').css('background-image', 'url(' + bgs[rollBg] + ')');
+    }
+
+    // Function to update the raid timer
+    function updateRaidTimer() {
+      const now = new Date();
+      // Calculate time until the next full hour
+      const nextHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 0, 0, 0);
+      let diff = nextHour - now;
+
+      // Handle cases where the time crosses midnight or is very close to the hour
+      if (diff < 0) { // If nextHour is in the past, calculate for the hour after that
+          nextHour.setHours(nextHour.getHours() + 1);
+          diff = nextHour - now;
+      }
+
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+      const formattedSeconds = seconds < 10 ? '0' + seconds : seconds;
+
+      $('#raid-timer').text(`${formattedMinutes}:${formattedSeconds}`);
+
+      // Placeholder for changing KOL every hour - this is where you'd integrate dynamic content
+      if (minutes === 0 && seconds === 0) { // When the timer hits 00:00
+          console.log("Time to change KOL!");
+          // Here you would likely fetch new KOL data from a backend or an array
+          // For demonstration, let's just log. A real implementation would update:
+          // $('#kol-image').attr('src', 'new_kol.png');
+          // $('#kol-name').text('NEW KOL NAME');
+          // $('#raid-phrase-text').text('New raid phrase!');
+          // And then restart the timer for the next hour if needed
+          updateRaidTimer(); // Recalculate for the *next* hour immediately
+      }
+    }
+
+    $(document).ready(function() {
+      // Initialize the background using the original function
+      chooseBg();
+      // Set a random background position on load
+      const map_x = Math.floor(Math.random() * 2000);
+      const map_y = Math.floor(Math.random() * 2000);
+      $('body').css('background-position', map_x + 'px ' + map_y + 'px').addClass('bg');
+
+      // Update the timer every second
+      setInterval(updateRaidTimer, 1000);
+      updateRaidTimer(); // Call immediately to set initial time
+    });
+  </script>
+</head>
+<body>
+
+<div class="main">
+
+  <div class="header-logo">
+    <img src="logo.png" alt="Raid DAO Logo">
+    <h1>RAID DAO</h1>
+    <a href="https://twitter.com/RaidDAOSOL" target="_blank" style="margin-left: auto;">TWITTER @RaidDAOSOL</a>
+  </div>
+
+  <div class="window info-panel">
+    <div class="title"><h3>Ticker</h3></div>
+    <p>$RAID</p>
+    <p>@RaidDAOSOL</p>
+    
+    <div class="title" style="top: 100px;"><h3>RAID START AT :</h3></div>
+    <div class="next-raid-timer" id="raid-timer">
+      00:00
+    </div>
+  </div>
+
+  <div class="window raid-panel">
+    <div class="title"><h3>The Next KOL We Will Raid</h3></div>
+    <div class="kol-raid-section">
+      <img src="kol1.jpg" alt="KOL Image" id="kol-image"> <!-- Added ID for potential dynamic updates -->
+      <div class="kol-details">
+        <strong id="kol-name">Log100x</strong> <!-- Added ID for potential dynamic updates -->
+        <p>"Together, the community decides which KOL to raid — and we don’t stop until he buys."</p>
+        <p>Time :032</p> <!-- This "Time" is static, you might want to remove it or make it dynamic -->
+      </div>
+    </div>
+    <div class="raid-phrase-section">
+      <strong>Raid Phrase:</strong>
+      <p id="raid-phrase-text">"Raid DAO has born, all kol should fear, and you have been chosen"</p> <!-- Added ID for potential dynamic updates -->
+    </div>
+  </div>
+
+  <div class="window features-panel">
+    <div class="title"><h3>⚙️ FEATURES</h3></div>
+    <ul>
+      <li>Target Voting</li>
+      <li>Raid Phases</li>
+      <li>Raid Rewards</li>
+      <li>Meme Command Center</li>
+      <li>Raid Points System</li>
+      <li>Cooldown & Rotation</li>
+      <li>Proof of Raid Archive</li>
+    </ul>
+  </div>
+
+  <div class="window how-it-works-panel">
+    <div class="title"><h3>⚙️ HOW IT WORKS</h3></div>
+    <ul>
+      <li>Vote for the Target</li>
+      <li>Raid Begins</li>
+      <li>Track the Outcome</li>
+      <li>Claim Rewards</li>
+      <li>Rotate</li>
+    </ul>
+  </div>
+
+  <div class="window lore-panel">
+    <div class="title"><h3>🧬 LORE</h3></div>
+    <p>
+      Crypto is built on attention. So we organized it.
+    </p>
+    <p>
+      Raid DAO is a social coordination engine disguised as a memecoin. Every cycle, holders vote on a target KOL (Key Opinion Leader) — a trader, influencer, or personality that the DAO believes “must witness the project.”
+    </p>
+    <p>
+      Once the vote ends, the Raid begins. Memes, comments, tags, and quotes flood timelines, mentions, and replies until the target reacts… or gives in and buys.
+    </p>
+    <p>
+      It’s not harassment — it’s meme warfare. A coordinated cultural operation, executed with precision and humor.
+    </p>
+    <p>
+      And when the target finally buys — the raid ends. The chain celebrates. The DAO picks a new victim.
+    </p>
+  </div>
+
+
+
+</div>
+  
+</body>
+</html>
